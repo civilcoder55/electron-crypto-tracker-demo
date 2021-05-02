@@ -1,3 +1,3 @@
 # notifierapp
 
-<img src="/nDQuVyi9Al.gif">
+<img src="/static/images/screenshot.png">

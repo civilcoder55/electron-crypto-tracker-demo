@@ -1,23 +1,23 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 
-function createWindow() {
-  // Create the browser window.
+app.whenReady().then(() => {
   let win = new BrowserWindow({
-    width: 618,
-    height: 480,
+    width: 939,
+    height: 720,
     frame: false,
     show: false,
     resizable: false,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
     },
   });
-  //win.webContents.openDevTools()
-  win.once("ready-to-show", () => {
-    win.show();
-  });
-  // and load the index.html of the app.
+  // win.webContents.openDevTools();
+  win.once("ready-to-show", () => win.show());
   win.loadFile("index.html");
-}
+});
 
-app.whenReady().then(createWindow);
+//EVENT LISTNERS
+ipcMain.on("closeApp", (evt, arg) => app.quit());
+
+ipcMain.on("minimizeApp", (evt, arg) => BrowserWindow.getFocusedWindow().minimize());

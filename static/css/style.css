@@ -1,0 +1,52 @@
+body{
+  -webkit-app-region: no-drag;
+}
+[v-cloak] {
+  display: none;
+}
+
+h1 {
+  text-align: center;
+}
+
+td img {
+  width: 25px;
+}
+
+.jumbotron p {
+  font-size: 1.2em;
+}
+
+.jumbotron {
+  margin-top: 5em;
+  margin-bottom: 5em;
+}
+
+
+.table td {
+  text-align: center;   
+}
+
+td img {
+  vertical-align: -7px;
+}
+
+.dragable{
+  text-transform:capitalize;
+  -webkit-app-region: drag;
+}
+
+
+
+.nonDragable{
+  -webkit-app-region: no-drag;
+}
+
+.navbar-brand{
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace!important;
+}
+
+
+.text-monospace{
+  margin-top: 4px;
+}

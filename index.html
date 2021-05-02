@@ -1,221 +1,91 @@
-<!doctype html>
-<html lang="en" style=>
-   <head>
-      <meta charset="utf-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>Btc Notifier</title>
-      <link rel="stylesheet" href="fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
-      <link href="css/jumbo-bootstrap.css" rel="stylesheet">
-      <link href="css/jumbo-core.min.css" rel="stylesheet">
-      <script>
-         const {  closeApp, minimizeApp, focus ,saveSettings,readSettings,addFav,removeFav,showTime ,setPrice,getPrice } = require('./index.js');
-      </script>
-   </head>
-   <body id="body" data-theme="dark-indigo" style="-webkit-app-region: no-drag">
-      <div class="titlebar" style="-webkit-app-region: drag;height: 20px !important; background-color:#222831">
-         <button onclick="closeApp()" class="gx-fab-btn gx-btn-secondary gx-btn-fab-xs" style="-webkit-app-region: no-drag;float:right;height: 15px !important;width: 15px !important;margin-top:2.5px;margin-bottom:2.5px;margin-right:5px"></button>
-         <button onclick="minimizeApp()" class="gx-fab-btn gx-btn-blue gx-btn-fab-xs" style="-webkit-app-region: no-drag;float:right;height: 15px !important;width: 15px !important;margin-top:2.5px;margin-bottom:2.5px;margin-right:5px"></button>
-         <h5 style="margin:0 auto ; color:white ;width: fit-content;">Notifier</h5>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crypto Tracker</title>
+    <!-- Halfmoon CSS -->
+    <link href="static/css/halfmoon.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link href="static/css/font-awesome.css" rel="stylesheet" />
+    <!-- App Css -->
+    <link href="static/css/style.css" rel="stylesheet" />
+    <!-- Electron Func -->
+    <script>
+      const { closeApp, minimizeApp, focus } = require("./index.js");
+    </script>
+  </head>
+  <body data-set-preferred-theme-onload="true">
+    <div id="app">
+      <div class="page-wrapper">
+        <div class="sticky-alerts"></div>
+        <div class="content-wrapper">
+          <nav class="navbar dragable">
+            <a href="#" class="navbar-brand">Crypto Tracker </a>
+            <span class="badge text-monospace ml-5">{{ time }}</span>
+            <span class="badge text-monospace ml-5">next update in {{ refresh }} seconds</span>
+            <div class="navbar-content ml-auto">
+              <button class="btn btn-action mr-5 nonDragable" type="button" onclick="halfmoon.toggleDarkMode()" aria-label="Toggle dark mode">
+                <i class="fa fa-moon-o" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-action mr-5 nonDragable" type="button" onclick="minimizeApp()">
+                <i class="fa fa-window-minimize" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-action mr-5 nonDragable" type="button" onclick="closeApp()">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </nav>
+          <br />
+          <main class="container-sm d-flex justify-content-center">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <td>Rank</td>
+                  <td>Name</td>
+                  <td>Symbol</td>
+                  <td>Price (USD)</td>
+                  <td>1H</td>
+                  <td>1D</td>
+                  <td>Market Cap (USD)</td>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr v-cloak v-for="(coin,index) in coins">
+                  <td>{{ index + 1 }}</td>
+                  <td><img v-bind:src="CRYPTOCOMPARE_URI + coin.CoinInfo.ImageUrl" /> {{ coin.CoinInfo.FullName }}</td>
+                  <td>{{ coin.CoinInfo.Name }}</td>
+                  <td>{{ coin.RAW.USD.PRICE | currency }}</td>
+                  <td v-bind:style="getColor(coin.RAW.USD.CHANGEPCTHOUR)">
+                    <span v-if="coin.RAW.USD.CHANGEPCTHOUR > 0">+</span>{{ coin.RAW.USD.CHANGEPCTHOUR | percent(2) }}
+                  </td>
+                  <td v-bind:style="getColor(coin.RAW.USD.CHANGEPCTDAY)">
+                    <span v-if="coin.RAW.USD.CHANGEPCTDAY > 0">+</span>{{ coin.RAW.USD.CHANGEPCTDAY | percent(2) }}
+                  </td>
+                  <td>{{ coin.RAW.USD.MKTCAP | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </main>
+        </div>
       </div>
-      <!-- Loader Backdrop -->
-      <div class="loader-backdrop">
-         <!-- Loader -->
-         <div class="loader">
-            <svg class="circular" viewBox="25 25 50 50">
-               <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
-            </svg>
-         </div>
-         <!-- /loader-->
-      </div>
-      <!-- loader backdrop -->
-      <div class="gx-container">
-         <div style="width: 100%;height:100%">
-            <div class="gx-card" id="all">
-               <div class="gx-card-header d-flex align-items-center">
-                  <h3 class="mb-0 mr-auto">Current Currencies Price</h3>
-                  <span class="badge badge-primary" id="date"></span>
-               </div>
-               <div class="table-responsive">
-                  <table class="default-table table table-sm remove-table-border">
-                     <thead>
-                        <tr>
-                           <th scope="col">Currency</th>
-                           <th scope="col" class="text-center">Price</th>
-                           <th scope="col" class="text-center">Favourite</th>
-                           <th scope="col"></th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        <tr>
-                           <td class="max-width-100">
-                              <h4 class="text-truncate mb-0">Bitcoin</h4>
-                           </td>
-                           <td class="text-center"><span class="d-block badge badge-warning" id="btc">Loading...</span>
-                           </td>
-                           <td class="text-center p-1"> <a href="javascript:void(0)" onclick="addFav('btc')" id="all-btc" class="d-block text-uppercase badge badge-light">add btc to Favourite</a>
-                           </td>
-                        </tr>
-                        <tr>
-                           <td class="max-width-100">
-                              <h4 class="text-truncate mb-0">Litecoin</h4>
-                           </td>
-                           <td class="text-center"><span class="d-block badge badge-warning" id="ltc">Loading...</span>
-                           </td>
-                           <td class="text-center p-1"> <a href="javascript:void(0)" id="all-ltc" onclick="addFav('ltc')" class="d-block text-uppercase badge badge-light">add ltc to Favourite</a>
-                           </td>
-                        </tr>
-                        <tr>
-                           <td class="max-width-100">
-                              <h4 class="text-truncate mb-0">Ethereum</h4>
-                           </td>
-                           <td class="text-center"><span class="d-block badge badge-warning" id="eth">Loading...</span>
-                           </td>
-                           <td class="text-center p-1"> <a href="javascript:void(0)" id="all-eth" onclick="addFav('eth')" class="d-block text-uppercase badge badge-light">add eth to Favourite</a>
-                           </td>
-                        </tr>
-                        <tr>
-                           <td class="max-width-100">
-                              <h4 class="text-truncate mb-0">Bitcoin Cash</h4>
-                           </td>
-                           <td class="text-center"><span class="d-block badge badge-warning" id="btcc">Loading...</span>
-                           </td>
-                           <td class="text-center p-1"> <a href="javascript:void(0)" id="all-btcc" onclick="addFav('btcc')" class="d-block text-uppercase badge badge-light">add btcc to Favourite</a>
-                           </td>
-                        </tr>
-                     </tbody>
-                  </table>
-               </div>
-            </div>
-            <div class="gx-card" id="fav" hidden>
-               <div class="gx-card-header d-flex align-items-center">
-                  <h3 class="mb-0 mr-auto">Favourite Currencies Price</h3>
-                  <span class="badge badge-primary" id="date2"></span>
-               </div>
-               <div class="table-responsive">
-                  <table class="default-table table table-sm remove-table-border">
-                     <thead>
-                        <tr>
-                           <th scope="col">Currency</th>
-                           <th scope="col" class="text-center">Price</th>
-                           <th scope="col" class="text-center">Favourite</th>
-                           <th scope="col"></th>
-                        </tr>
-                     </thead>
-                     <tbody id="favList"></tbody>
-                  </table>
-               </div>
-            </div>
-            <div class="gx-card" id="settings" hidden>
-               <div class="gx-card-header d-flex align-items-center">
-                  <h3 class="mb-0 mr-auto">Settings</h3>
-                  <span class="badge badge-primary" id="date2"></span>
-               </div>
-               <div style="overflow: hidden;">
-                  <h3 style="float: left;">Notifications</h3>
-                  <div class="material-switch" style="float: right;margin-right: 5px;">
-                     <input id="switch" name="switch" type="checkbox">
-                     <label for="switch" class="label-default"></label>
-                  </div>
-               </div>
-            </div>
-         </div>
-         <div class="gx-card" style="position: fixed;bottom:0;width:100%">
-            <div class="gx-card-body">
-               <ul id="bottom-navigation-label" class="bottom-navigation">
-                  <li class="active">
-                     <a href="javascript:void(0)" onclick="function tab(){
-                        $('#fav').attr('hidden',true)
-                        $('#settings').attr('hidden',true)
-                        $('#all').attr('hidden',false)
-                        }tab()"> <i class="zmdi zmdi-time-restore"></i>
-                     <span>All</span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="javascript:void(0)" onclick="function tab(){
-                        $('#all').attr('hidden',true)
-                        $('#settings').attr('hidden',true)
-                        $('#fav').attr('hidden',false)
-                        }tab()"> <i class="zmdi zmdi-favorite"></i>
-                     <span>Favorites</span>
-                     </a>
-                  </li>
-                  <li>
-                     <a href="javascript:void(0)" onclick="function tab(){
-                        $('#all').attr('hidden',true)
-                        $('#fav').attr('hidden',true)
-                        $('#settings').attr('hidden',false)
-                        }tab()"> <i class="zmdi zmdi-pin"></i>
-                     <span>Settings</span>
-                     </a>
-                  </li>
-               </ul>
-            </div>
-         </div>
-      </div>
-      <!-- /menu backdrop -->
-      <script>
-         if (typeof module === 'object') { window.module = module; module = undefined; }
-      </script>
-      <script src="js/jquery.min.js"></script>
-      <script src="js/bootstrap.bundle.min.js"></script>
-      <script src="js/perfect-scrollbar.min.js"></script>
-      <script src="js/bigSlide.min.js"></script>
-      <script src="js/functions.js"></script>
-      <script src="js/bottom-navigation.js"></script>
-      <script>
-         $(document).ready(async () => {
-                     settings = await readSettings()
-                     Object.keys(settings.favourite).forEach(function (key) {
-                         if (settings.favourite[key]) {
-                             $(`#all-${key}`).attr('class', 'd-block text-uppercase badge badge-primary')
-                             $(`#all-${key}`).text(`you added ${key} to favourite`)
-                             $(`#all-${key}`).removeAttr(`onclick`)
-                             $(`#all-${key}`).attr('style', "pointer-events: none;")
-                             $('#favList').append(`<tr>\
-                                 <td class="max-width-100">
-                                     <h4 class="text-truncate mb-0">${key}</h4>
-                                 </td>
-                             </td>
-                             <td class="text-center"><span class="d-block badge badge-warning"
-                                     id="${key}">Loading...</span></td>
-                                 <td class="text-center p-1">
-                                     <a href="javascript:void(0)" id="fav-${key}" onclick="removeFav('${key}')" class="d-block text-uppercase badge badge-info">Remove ${key} from Favourite</a> 
-                                 
-                             </tr>`)
-                         }
-                     });            
-                     showTime()
-                     current = { btc: 0, ltc: 0, btcc: 0, eth: 0 }	
-                     async function notification() {
-                         let notif = new Notification('btc price', { body: current.btc, icon: ".\\bitcoin.ico" })
-                         notif.onclick = focus
-                     };
-                     getPrice()
-                     setInterval(getPrice, 5000)
-                     if (settings.notifications) {
-                         $('#switch').prop('checked', true);
-                         notificationInterval = setInterval(notification, 60000)
-                     }
-                     $(function () {
-                         $('#switch').change(async function () {
-                             if ($(this).prop('checked')) {
-                                 notification()
-                                 notificationInterval = setInterval(notification, 60000)
-                                 settings = await readSettings()
-                                 settings.notifications = $(this).prop('checked')
-                                 saveSettings(settings)
-                             } else {
-                                 clearInterval(notificationInterval);
-                                 settings = await readSettings()
-                                 settings.notifications = $(this).prop('checked')
-                                 saveSettings(settings)
-                             }
-         
-                         })
-                     })
-                 });
-      </script>
-   </body>
+    </div>
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <!-- Halfmoon JS -->
+    <script src="static/js/halfmoon.js"></script>
+    <!-- Vue JS -->
+    <script src="static/js/vue@2.6.12.js"></script>
+    <!-- Vue filters -->
+    <script src="static/js/vue2-filters.js"></script>
+    <!-- Axios -->
+    <script src="static/js/axios.js"></script>
+    <!-- App JS -->
+    <script src="static/js/app.js"></script>
+  </body>
 </html>
