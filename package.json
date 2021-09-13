@@ -1,5 +1,5 @@
 {
-  "name": "crypto_tracker",
+  "name": "crypto-tracker",
   "version": "0.1.0",
   "main": "main.js",
   "scripts": {
@@ -13,8 +13,7 @@
       "icon": "./static/images/icon.ico"
     },
     "linux": {
-      "icon": "./static/images/icon.png",
-      "target": "AppImage"
+      "target": "snap"
     }
   },
   "devDependencies": {

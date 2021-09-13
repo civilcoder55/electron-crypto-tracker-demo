@@ -11,4 +11,4 @@ function minimizeApp() {
 }
 
 
-module.exports = { closeApp, minimizeApp, focus };
+module.exports = { closeApp, minimizeApp};
