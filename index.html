@@ -58,10 +58,10 @@
                   <td>{{ coin.CoinInfo.Name }}</td>
                   <td>{{ coin.RAW.USD.PRICE | currency }}</td>
                   <td v-bind:style="getColor(coin.RAW.USD.CHANGEPCTHOUR)">
-                    <span v-if="coin.RAW.USD.CHANGEPCTHOUR > 0">+</span>{{ coin.RAW.USD.CHANGEPCTHOUR | percent(2) }}
+                    <span v-if="coin.RAW.USD.CHANGEPCTHOUR > 0">+</span>{{ coin.RAW.USD.CHANGEPCTHOUR | percent(2,10) }}
                   </td>
                   <td v-bind:style="getColor(coin.RAW.USD.CHANGEPCTDAY)">
-                    <span v-if="coin.RAW.USD.CHANGEPCTDAY > 0">+</span>{{ coin.RAW.USD.CHANGEPCTDAY | percent(2) }}
+                    <span v-if="coin.RAW.USD.CHANGEPCTDAY > 0">+</span>{{ coin.RAW.USD.CHANGEPCTDAY | percent(2,10) }}
                   </td>
                   <td>{{ coin.RAW.USD.MKTCAP | currency }}</td>
                 </tr>
