@@ -13,7 +13,7 @@
       "icon": "./static/images/icon.ico"
     },
     "linux": {
-      "icon": "./static/images/icon.ico",
+      "icon": "./static/images/icon.png",
       "target": "AppImage"
     }
   },
